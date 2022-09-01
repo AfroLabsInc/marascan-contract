@@ -1,6 +1,5 @@
 {
   "name": "hardhat-project",
-
   "scripts": {
     "commit": "cz"
   },
@@ -14,5 +13,9 @@
     "commitizen": {
       "path": "./node_modules/cz-emoji"
     }
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3",
+    "@openzeppelin/contracts-upgradeable": "^4.7.3"
   }
 }
