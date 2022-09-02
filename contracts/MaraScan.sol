@@ -15,24 +15,22 @@ contract MaraScan is AccessControl, Initializable {
     );
     /** =====SUPPORTED TOKENS======= **/
     // USDT address
-    address public USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
 
     /** =====SUPPORTED ROLES======= **/
     /** The Deployer is inherits the admin role */
     bytes32 public constant ADMIN_ROLE = 0x00;
       
     // ===Badge Contract ======
-    address public BADGE = 0xdAC17F958D2ee523a2206206994597C13D831ec7; 
+    address public BADGE = 0xd9145CCE52D386f254917e481eB44e9943F39138; 
 
 
     mapping(address => bool) public approvedTokens;
 
     function initialize() public initializer {
         _setupRole(ADMIN_ROLE, msg.sender);
-        approvedTokens[USDT] = true;
     }
 
-    function disburse(
+    function donateAndDisburseToken(
         address _tokenAddress,
         uint256 _amount,
         address[] calldata _beneficiaries,
@@ -49,14 +47,15 @@ contract MaraScan is AccessControl, Initializable {
         );
         
         // send tokens to contract
+        
         token.transferFrom(msg.sender, address(this), _amount);
-
+        
         // Disburesement Logic Begins
         uint256 amountPerBeneficiary = _amount / _beneficiaries.length;
         for (uint256 index = 0; index < _beneficiaries.length; index++) {
             require(
                 token.transfer(_beneficiaries[index], amountPerBeneficiary),
-                string.concat("Unable to transfer ", token.symbol())
+                "Unable to transfer token"
             );
         }
         // Disbursement ends
@@ -66,7 +65,13 @@ contract MaraScan is AccessControl, Initializable {
         emit Disbursed(msg.sender, _amount, _beneficiaries);
     }
 
-
+    function setAprovedToken (address _tokenAddress) public onlyRole(ADMIN_ROLE) {
+        approvedTokens[_tokenAddress] = true;
+    }
+    
+    function setBadgeTokenContract(address _tokenAddress) public onlyRole(ADMIN_ROLE) {
+        BADGE = _tokenAddress;
+    }
     // ===============WITHDRAW FUNCTIONS========================
     function emergencyWithdrawETH() external onlyRole(ADMIN_ROLE) {
         AddressUpgradeable.sendValue(
