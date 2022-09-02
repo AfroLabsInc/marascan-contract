@@ -7,11 +7,19 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./IBadges.sol";
+
 contract MaraScan is AccessControl, Initializable {
     event Disbursed(
         address indexed donor,
         uint256 amount,
         address[] indexed beneficiaries
+    );
+
+    event ApproveToken(address indexed contractAddress);
+
+    event ChangedBadgeContract(
+        address indexed newContract,
+        address indexed oldContract
     );
     /** =====SUPPORTED TOKENS======= **/
     // USDT address
@@ -19,10 +27,9 @@ contract MaraScan is AccessControl, Initializable {
     /** =====SUPPORTED ROLES======= **/
     /** The Deployer is inherits the admin role */
     bytes32 public constant ADMIN_ROLE = 0x00;
-      
-    // ===Badge Contract ======
-    address public BADGE = 0xd9145CCE52D386f254917e481eB44e9943F39138; 
 
+    // ===Badge Contract ======
+    address public BADGE = 0xd9145CCE52D386f254917e481eB44e9943F39138;
 
     mapping(address => bool) public approvedTokens;
 
@@ -45,11 +52,11 @@ contract MaraScan is AccessControl, Initializable {
             token.balanceOf(msg.sender) >= _amount,
             "Amount to donate exceeds balance"
         );
-        
+
         // send tokens to contract
-        
+        // it requires approval 
         token.transferFrom(msg.sender, address(this), _amount);
-        
+
         // Disburesement Logic Begins
         uint256 amountPerBeneficiary = _amount / _beneficiaries.length;
         for (uint256 index = 0; index < _beneficiaries.length; index++) {
@@ -65,13 +72,20 @@ contract MaraScan is AccessControl, Initializable {
         emit Disbursed(msg.sender, _amount, _beneficiaries);
     }
 
-    function setAprovedToken (address _tokenAddress) public onlyRole(ADMIN_ROLE) {
+    function setAprovedToken(address _tokenAddress)
+        public
+        onlyRole(ADMIN_ROLE)
+    {
         approvedTokens[_tokenAddress] = true;
     }
-    
-    function setBadgeTokenContract(address _tokenAddress) public onlyRole(ADMIN_ROLE) {
+
+    function setBadgeTokenContract(address _tokenAddress)
+        public
+        onlyRole(ADMIN_ROLE)
+    {
         BADGE = _tokenAddress;
     }
+
     // ===============WITHDRAW FUNCTIONS========================
     function emergencyWithdrawETH() external onlyRole(ADMIN_ROLE) {
         AddressUpgradeable.sendValue(
@@ -89,6 +103,9 @@ contract MaraScan is AccessControl, Initializable {
             "Value too small"
         );
 
-        ERC20(_tokenAddress).transfer(msg.sender, ERC20(_tokenAddress).balanceOf(address(this)));
+        ERC20(_tokenAddress).transfer(
+            msg.sender,
+            ERC20(_tokenAddress).balanceOf(address(this))
+        );
     }
 }
