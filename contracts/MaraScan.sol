@@ -1,4 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
+/**
+|     |   /\    /-----\ |  /         |\  /|   /\   |--\    /\   
+|_____|  /  \  |        |/           | \/ |  /  \  |_ /   /  \  
+|-----| /----\ |        | \          |    | /----\ |  \  /----\ 
+|     |/      \ \_____  |   \        |    |/      \|   \/      \ 
+ */
 pragma solidity ^0.8.2;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -6,14 +12,26 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 // import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./IBadges.sol";
-interface IUniswapV2Router02 {
 
-    function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
-        external
-        payable
-        returns (uint[] memory amounts);
+interface IUniswapV2Router02 {
+    function swapExactETHForTokens(
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external payable returns (uint256[] memory amounts);
+
+    function swapExactTokensForTokens(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
+
     function WETH() external pure returns (address);
 }
+
 interface ERC20 {
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -27,7 +45,11 @@ interface ERC20 {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to {approve}. `value` is the new allowance.
      */
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 
     /**
      * @dev Returns the amount of tokens in existence.
@@ -55,7 +77,10 @@ interface ERC20 {
      *
      * This value changes when {approve} or {transferFrom} are called.
      */
-    function allowance(address owner, address spender) external view returns (uint256);
+    function allowance(address owner, address spender)
+        external
+        view
+        returns (uint256);
 
     /**
      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
@@ -90,6 +115,7 @@ interface ERC20 {
 }
 
 contract MaraScan is AccessControl, Initializable {
+    // uniswap address
     address internal constant UNISWAP_ROUTER_ADDRESS =
         0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     IUniswapV2Router02 public uniswapRouter;
@@ -98,21 +124,28 @@ contract MaraScan is AccessControl, Initializable {
     /** The Deployer is inherits the admin role */
     bytes32 public constant ADMIN_ROLE = 0x00;
 
-    // ===Badge Contract ======
-    address public BADGE = 0xd9145CCE52D386f254917e481eB44e9943F39138;
+    // ===Badge Contract ADDRESS======
+    address public BADGE;
 
+    // ====USDC Contract ADDRESS=====
+    address public USDC;
+
+    // ====Acceptable Tokens========
     mapping(address => bool) public approvedTokens;
+    // ==== ON-DISBURSED ====
     event Disbursed(
         address indexed donor,
         uint256 amount,
         address[] indexed beneficiaries
     );
-
+    // ==== ON-TOKEN_APPROVAL =====
     event ApproveToken(address indexed contractAddress);
 
     event ChangedBadgeContract(
-        address indexed newContract,
-        address indexed oldContract
+        address indexed newContract
+    );
+    event ChangedUSDCContract(
+        address indexed newContract
     );
 
     function initialize() public initializer {
@@ -127,7 +160,7 @@ contract MaraScan is AccessControl, Initializable {
         bytes memory _category
     ) external {
         require(
-            approvedTokens[_tokenAddress],
+            _tokenAddress == USDC,
             "This token is not recognised for donation"
         );
         ERC20 token = ERC20(_tokenAddress);
@@ -140,11 +173,86 @@ contract MaraScan is AccessControl, Initializable {
         // it requires approval
         token.transferFrom(msg.sender, address(this), _amount);
 
-        // Disburesement Logic Begins
+        // Disburesement
+        _disburseToken(_tokenAddress, _amount, _beneficiaries, _category);
+    }
+
+    function SwapExactETHForTokens(
+        uint256 amountOut,
+        address[] calldata _beneficiaries,
+        bytes memory _category
+    ) external payable {
+        address[] memory path = new address[](2);
+        path[0] = uniswapRouter.WETH();
+        path[1] = USDC;
+        uniswapRouter.swapExactETHForTokens{value: msg.value}(
+            amountOut,
+            path,
+            address(this),
+            block.timestamp + 50
+        );
+
+        _disburseToken(
+            USDC,
+            ERC20(USDC).balanceOf(address(this)),
+            _beneficiaries,
+            _category
+        );
+    }
+
+    function swapExactTokensForTokens(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address tokenIn,
+        address[] calldata _beneficiaries,
+        bytes memory _category
+    ) external payable {
+        require(
+            approvedTokens[tokenIn],
+            "This token is not recognised for donation"
+        );
+                ERC20 tokenInContract = ERC20(tokenIn);
+        require(
+            tokenInContract.balanceOf(msg.sender) >= amountIn,
+            "Amount to donate exceeds balance"
+        );
+        address[] memory path = new address[](2);
+        path[0] = tokenIn;
+        path[1] = USDC;
+        // send tokens to contract
+        tokenInContract.transferFrom(msg.sender, address(this), amountIn);
+
+        // approve uniswap router on this token
+        tokenInContract.approve(address(uniswapRouter), amountIn);
+        uniswapRouter.swapExactTokensForTokens(
+            amountIn,
+            amountOutMin,
+            path,
+            address(this),
+            block.timestamp + 50
+        );
+
+        _disburseToken(
+            USDC,
+            ERC20(USDC).balanceOf(address(this)),
+            _beneficiaries,
+            _category
+        );
+    }
+
+    function _disburseToken(
+        address _tokenAddress,
+        uint256 _amount,
+        address[] calldata _beneficiaries,
+        bytes memory _category
+    ) internal {
         uint256 amountPerBeneficiary = _amount / _beneficiaries.length;
         for (uint256 index = 0; index < _beneficiaries.length; index++) {
             require(
-                token.transfer(_beneficiaries[index], amountPerBeneficiary),
+                ERC20(_tokenAddress).transfer(
+                    _beneficiaries[index],
+                    amountPerBeneficiary
+                ),
                 "Unable to transfer token"
             );
         }
@@ -154,22 +262,8 @@ contract MaraScan is AccessControl, Initializable {
         IBadges(BADGE).mintBadge(0, msg.sender, _category);
         emit Disbursed(msg.sender, _amount, _beneficiaries);
     }
-    function SwapExactETHForTokens(
-        uint amountOut,
-        address token
-    ) external payable {
-        address[] memory path = new address[](2);
-        path[0] = uniswapRouter.WETH();
-        path[1] = token;
-        uniswapRouter.swapExactETHForTokens{ value: msg.value }(
-            amountOut,
-            path,
-            msg.sender,
-            block.timestamp + 50
-        );
-        
-    }
-    function ApproveTokenForDonation(address _tokenAddress)
+
+    function approveTokenForDonation(address _tokenAddress)
         public
         onlyRole(ADMIN_ROLE)
     {
@@ -180,7 +274,18 @@ contract MaraScan is AccessControl, Initializable {
         public
         onlyRole(ADMIN_ROLE)
     {
+        
         BADGE = _tokenAddress;
+        emit ChangedBadgeContract(_tokenAddress);
+        
+    }
+
+    function setUSDCTokenContract(address _tokenAddress)
+        public
+        onlyRole(ADMIN_ROLE)
+    {
+        USDC = _tokenAddress;
+        emit ChangedUSDCContract(_tokenAddress);
     }
 
     // ===============WITHDRAW FUNCTIONS========================

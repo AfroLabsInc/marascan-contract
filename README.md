@@ -1,13 +1,44 @@
-# Sample Hardhat Project
+# MaraScan Contract
+This contract was written in purpose of a Hackathon. Security issues may not be analyzed correctly, use cautiosly
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
 
-Try running some of the following tasks:
+## Concepts of the MaraScan Contract?
+- It is an upgradeable UUPS contract
+- Accepts USDC (central cuurency) Token from donor and disbures equally to beneficiaries
+- Accepts ETH from donor, swaps Exact ETH to USDC and disbures equally to beneficiaries
+- Accepts anyother approved tokens and swap Exact Token to USDC and disbures equally to beneficiaries
 
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
+### Disburesement
+```typescript
+function _disburseToken(
+        address _tokenAddress,
+        uint256 _amount,
+        address[] calldata _beneficiaries,
+        bytes memory _category
+    ) internal {
+        uint256 amountPerBeneficiary = _amount / _beneficiaries.length;
+        for (uint256 index = 0; index < _beneficiaries.length; index++) {
+            require(
+                ERC20(_tokenAddress).transfer(
+                    _beneficiaries[index],
+                    amountPerBeneficiary
+                ),
+                "Unable to transfer token"
+            );
+        }
+        // Disbursement ends
+
+        // Mint Badge
+        IBadges(BADGE).mintBadge(0, msg.sender, _category);
+        emit Disbursed(msg.sender, _amount, _beneficiaries);
+    }
 ```
+Upon disbursement of USDC, an ERC1155 is minted to Donor.
+
+```typescript
+    IBadges(BADGE).mintBadge(0, msg.sender, _category);
+```
+### Thirdparty Contract
+
+- UNISWAPV2ROUTER
+- BADGE CONTRACT
