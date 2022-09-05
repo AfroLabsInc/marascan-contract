@@ -1,10 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0
 /**
-|     |   /\    /-----\ |  /         |\  /|   /\   |--\    /\   
-|_____|  /  \  |        |/           | \/ |  /  \  |_ /   /  \  
-|-----| /----\ |        | \          |    | /----\ |  \  /----\ 
-|     |/      \ \_____  |   \        |    |/      \|   \/      \ 
- */
+  
+  #     #     #       ######  #     #     #######  #     #  #######       ##    ##     #      #####       #      
+  #     #    # #    #         #    #         #     #     #  #             # #  # #    # #     #    #     # #           
+  #######   #####   #         #####          #     #######  #######       #  ##  #   #####    #####     #####        
+  #     #  #     #  #         #    #         #     #     #  #             #      #  #     #   #    #   #     #          
+  #     # #       #  #######  #     #        #     #     #  #######       #      # #       #  #     # #       # 
+  
+  @title A Hack The Mara Hackathon Project
+  @author The name of the author
+  @notice This handles collections and disbursements of funds as USDC to beneficiaries
+  @notice This cotract is not audited and only written for the purpose of a Hackathon, take caution
+  */
 pragma solidity ^0.8.2;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -141,18 +148,28 @@ contract MaraScan is AccessControl, Initializable {
     // ==== ON-TOKEN_APPROVAL =====
     event ApproveToken(address indexed contractAddress);
 
-    event ChangedBadgeContract(
-        address indexed newContract
-    );
-    event ChangedUSDCContract(
-        address indexed newContract
-    );
+    event ChangedBadgeContract(address indexed newContract);
+    event ChangedUSDCContract(address indexed newContract);
 
+    /**
+     * @dev Entry to application
+     * @notice for deployment outside of this setup
+     * triger this function ``initialize``, then
+     * set the USDC and BADGE addresses by triggering the
+     * ``ChangedUSDCContract`` and ``ChangedBadgeContract``
+     **/
     function initialize() public initializer {
         _setupRole(ADMIN_ROLE, msg.sender);
         uniswapRouter = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
     }
 
+    /**
+     * @dev Recieves USDC token and disburse equally to Beneficiaries
+     * @param _tokenAddress: The Contract address of USDC
+     * @param _amount: amount of Token( USDC) to donate
+     * @param _beneficiaries: list of benefiaries addresses
+     * @param _category: Category of benefiaries
+     */
     function donateAndDisburseToken(
         address _tokenAddress,
         uint256 _amount,
@@ -177,6 +194,12 @@ contract MaraScan is AccessControl, Initializable {
         _disburseToken(_tokenAddress, _amount, _beneficiaries, _category);
     }
 
+    /**
+     * @dev Recieves ETH, Swap to USDC and disburse equally to Beneficiaries
+     * @param amountOut: Minimum amount of USDC to receive
+     * @param _beneficiaries: list of benefiaries addresses
+     * @param _category: Category of benefiaries
+     */
     function SwapExactETHForTokens(
         uint256 amountOut,
         address[] calldata _beneficiaries,
@@ -200,18 +223,26 @@ contract MaraScan is AccessControl, Initializable {
         );
     }
 
+    /**
+     * @dev Recieves An Approved Token, Swap to USDC and disburse equally to Beneficiaries
+     * @param tokenIn: The Contract address of the Approved Token
+     * @param amountIn: amount of Tokens to swap to USDC
+     * @param amountOutMin: Minimum amount of USDC to receive
+     * @param _beneficiaries: list of benefiaries addresses
+     * @param _category: Category of benefiaries
+     */
     function swapExactTokensForTokens(
         uint256 amountIn,
         uint256 amountOutMin,
         address tokenIn,
         address[] calldata _beneficiaries,
         bytes memory _category
-    ) external payable {
+    ) external {
         require(
             approvedTokens[tokenIn],
             "This token is not recognised for donation"
         );
-                ERC20 tokenInContract = ERC20(tokenIn);
+        ERC20 tokenInContract = ERC20(tokenIn);
         require(
             tokenInContract.balanceOf(msg.sender) >= amountIn,
             "Amount to donate exceeds balance"
@@ -240,6 +271,13 @@ contract MaraScan is AccessControl, Initializable {
         );
     }
 
+    /**
+     * @dev Recieves USDC token and disburse equally to Beneficiaries
+     * @param _tokenAddress: The Contract address of USDC
+     * @param _amount: amount of Token( USDC) to donate
+     * @param _beneficiaries: list of benefiaries addresses
+     * @param _category: Category of benefiaries
+     */
     function _disburseToken(
         address _tokenAddress,
         uint256 _amount,
@@ -274,10 +312,8 @@ contract MaraScan is AccessControl, Initializable {
         public
         onlyRole(ADMIN_ROLE)
     {
-        
         BADGE = _tokenAddress;
         emit ChangedBadgeContract(_tokenAddress);
-        
     }
 
     function setUSDCTokenContract(address _tokenAddress)
