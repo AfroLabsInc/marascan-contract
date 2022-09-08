@@ -2,5 +2,5 @@
 pragma solidity ^0.8.2;
 
 interface IBadges {
-    function mintBadge(uint256 id, address _to, bytes calldata category) external;
+    function mintBadge(uint256 id, address _to) external;
 }

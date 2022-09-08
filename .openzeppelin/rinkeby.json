@@ -1,0 +1,139 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x5588118Eb3906640De53A18bDE4221D42412aaD8",
+    "txHash": "0x6c2f29821988c7bf44abfa57ba3d055a06ecc647b9cd7b2c0a1feaed4b72e0d8"
+  },
+  "proxies": [
+    {
+      "address": "0x82c5Be768629a4e68dA43100cE7E2F28e623Cd81",
+      "txHash": "0x31b6ae716e82097334e8110202e9c88769ba523f07cab74a5ea8491db9ca5bc3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xCC7e167903Db063F509785Faeb6e154A4C31c241",
+      "txHash": "0xe4cd6587d7e9330359699636484d30a13aaa9765eb3e1637c89adbbe44db32d3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6040A31708261163aB1F3F0040244DC2e066b852",
+      "txHash": "0x3856f40df97ebb3f0ec6f1a98e71ea6d196273efc50db83fc1a2a9b1a6af98fe",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "ec179ec0ed0269a1195f72632170ec2be2f3794f87d85927f172a4a410043a91": {
+      "address": "0x91983a76772659559fd42d04d3E9661d9BB0FC63",
+      "txHash": "0x512a1a9b2b9de38e2b292549536376c490892daa427c0e6a18ad43201d7889e5",
+      "layout": {
+        "storage": [
+          {
+            "label": "_roles",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)413_storage)",
+            "contract": "AccessControl",
+            "src": "@openzeppelin/contracts/access/AccessControl.sol:55"
+          },
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "1",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "uniswapRouter",
+            "offset": 2,
+            "slot": "1",
+            "type": "t_contract(IUniswapV2Router02)1126",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:128"
+          },
+          {
+            "label": "BADGE",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:135"
+          },
+          {
+            "label": "USDC",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_address",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:138"
+          },
+          {
+            "label": "approvedTokens",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:141"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IUniswapV2Router02)1126": {
+            "label": "contract IUniswapV2Router02",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)413_storage)": {
+            "label": "mapping(bytes32 => struct AccessControl.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)413_storage": {
+            "label": "struct AccessControl.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}

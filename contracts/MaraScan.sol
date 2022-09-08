@@ -119,6 +119,7 @@ interface ERC20 {
         address to,
         uint256 amount
     ) external returns (bool);
+
 }
 
 contract MaraScan is AccessControl, Initializable {
@@ -127,8 +128,10 @@ contract MaraScan is AccessControl, Initializable {
         0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     IUniswapV2Router02 public uniswapRouter;
 
+    
+
+    address public MASTER_WALLET;
     /** =====SUPPORTED ROLES======= **/
-    /** The Deployer is inherits the admin role */
     bytes32 public constant ADMIN_ROLE = 0x00;
 
     // ===Badge Contract ADDRESS======
@@ -143,13 +146,20 @@ contract MaraScan is AccessControl, Initializable {
     event Disbursed(
         address indexed donor,
         uint256 amount,
-        address[] indexed beneficiaries
+        address[] indexed beneficiaries,
+        uint256[] indexed categories
     );
     // ==== ON-TOKEN_APPROVAL =====
     event ApproveToken(address indexed contractAddress);
 
     event ChangedBadgeContract(address indexed newContract);
     event ChangedUSDCContract(address indexed newContract);
+
+    // ======= MODIFIERS ==================
+    modifier onlyMasterWallet() {
+        require(msg.sender == MASTER_WALLET, "Caller is Not a master wallet");
+        _;
+    }
 
     /**
      * @dev Entry to application
@@ -164,6 +174,27 @@ contract MaraScan is AccessControl, Initializable {
     }
 
     /**
+     * @notice Disburses th Recieved USDC token and disburse equally to Beneficiaries
+     * @param _amount: amount of Token( USDC) to donate
+     * @param _beneficiaries: list of benefiaries addresses
+     * @param _category: Category of benefiaries
+     */
+    function recieveFromCircle(
+        uint256 _amount,
+        address[] calldata _beneficiaries,
+        uint256[] calldata _category
+    ) external onlyMasterWallet {
+        ERC20 token = ERC20(USDC);
+        require(
+            token.balanceOf(address(this)) >= _amount,
+            "Amount to disburse exceeds balance"
+        );
+
+        // Disburesement
+        _disburseToken(USDC, _amount, _beneficiaries, _category);
+    }
+
+    /**
      * @dev Recieves USDC token and disburse equally to Beneficiaries
      * @param _tokenAddress: The Contract address of USDC
      * @param _amount: amount of Token( USDC) to donate
@@ -174,13 +205,13 @@ contract MaraScan is AccessControl, Initializable {
         address _tokenAddress,
         uint256 _amount,
         address[] calldata _beneficiaries,
-        bytes memory _category
+        uint256[] calldata _category
     ) external {
         require(
             _tokenAddress == USDC,
             "This token is not recognised for donation"
         );
-        ERC20 token = ERC20(_tokenAddress);
+        ERC20 token = ERC20(USDC);
         require(
             token.balanceOf(msg.sender) >= _amount,
             "Amount to donate exceeds balance"
@@ -203,24 +234,16 @@ contract MaraScan is AccessControl, Initializable {
     function SwapExactETHForTokens(
         uint256 amountOut,
         address[] calldata _beneficiaries,
-        bytes memory _category
+        uint256[] calldata _category
     ) external payable {
         address[] memory path = new address[](2);
         path[0] = uniswapRouter.WETH();
         path[1] = USDC;
-        uniswapRouter.swapExactETHForTokens{value: msg.value}(
-            amountOut,
-            path,
-            address(this),
-            block.timestamp + 50
-        );
+        uint256[] memory swapResult = uniswapRouter.swapExactETHForTokens{
+            value: msg.value
+        }(amountOut, path, address(this), block.timestamp + 50);
 
-        _disburseToken(
-            USDC,
-            ERC20(USDC).balanceOf(address(this)),
-            _beneficiaries,
-            _category
-        );
+        _disburseToken(USDC, swapResult[1], _beneficiaries, _category);
     }
 
     /**
@@ -236,25 +259,25 @@ contract MaraScan is AccessControl, Initializable {
         uint256 amountOutMin,
         address tokenIn,
         address[] calldata _beneficiaries,
-        bytes memory _category
+        uint256[] calldata _category
     ) external {
         require(
             approvedTokens[tokenIn],
             "This token is not recognised for donation"
         );
-        ERC20 tokenInContract = ERC20(tokenIn);
+        ERC20 thisContract = ERC20(tokenIn);
         require(
-            tokenInContract.balanceOf(msg.sender) >= amountIn,
+            thisContract.balanceOf(msg.sender) >= amountIn,
             "Amount to donate exceeds balance"
         );
         address[] memory path = new address[](2);
         path[0] = tokenIn;
         path[1] = USDC;
         // send tokens to contract
-        tokenInContract.transferFrom(msg.sender, address(this), amountIn);
+        thisContract.transferFrom(msg.sender, address(this), amountIn);
 
         // approve uniswap router on this token
-        tokenInContract.approve(address(uniswapRouter), amountIn);
+        thisContract.approve(address(uniswapRouter), amountIn);
         uniswapRouter.swapExactTokensForTokens(
             amountIn,
             amountOutMin,
@@ -271,18 +294,11 @@ contract MaraScan is AccessControl, Initializable {
         );
     }
 
-    /**
-     * @dev Recieves USDC token and disburse equally to Beneficiaries
-     * @param _tokenAddress: The Contract address of USDC
-     * @param _amount: amount of Token( USDC) to donate
-     * @param _beneficiaries: list of benefiaries addresses
-     * @param _category: Category of benefiaries
-     */
     function _disburseToken(
         address _tokenAddress,
         uint256 _amount,
         address[] calldata _beneficiaries,
-        bytes memory _category
+        uint256[] calldata _category
     ) internal {
         uint256 amountPerBeneficiary = _amount / _beneficiaries.length;
         for (uint256 index = 0; index < _beneficiaries.length; index++) {
@@ -297,15 +313,24 @@ contract MaraScan is AccessControl, Initializable {
         // Disbursement ends
 
         // Mint Badge
-        IBadges(BADGE).mintBadge(0, msg.sender, _category);
-        emit Disbursed(msg.sender, _amount, _beneficiaries);
+        IBadges(BADGE).mintBadge(0, msg.sender);
+        emit Disbursed(msg.sender, _amount, _beneficiaries, _category);
     }
+
+ 
 
     function approveTokenForDonation(address _tokenAddress)
         public
         onlyRole(ADMIN_ROLE)
     {
         approvedTokens[_tokenAddress] = true;
+    }
+
+    function setMasterWallet(address _masterWallet)
+        public
+        onlyRole(ADMIN_ROLE)
+    {
+        MASTER_WALLET = _masterWallet;
     }
 
     function setBadgeTokenContract(address _tokenAddress)
