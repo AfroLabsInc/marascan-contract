@@ -12,6 +12,7 @@
   @notice This handles collections and disbursements of funds as USDC to beneficiaries
   @notice This cotract is not audited and only written for the purpose of a Hackathon, take caution
   */
+
 pragma solidity ^0.8.2;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";

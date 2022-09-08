@@ -119,7 +119,6 @@ interface ERC20 {
         address to,
         uint256 amount
     ) external returns (bool);
-
 }
 
 contract MaraScan is AccessControl, Initializable {
@@ -127,8 +126,6 @@ contract MaraScan is AccessControl, Initializable {
     address internal constant UNISWAP_ROUTER_ADDRESS =
         0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     IUniswapV2Router02 public uniswapRouter;
-
-    
 
     address public MASTER_WALLET;
     /** =====SUPPORTED ROLES======= **/
@@ -140,15 +137,34 @@ contract MaraScan is AccessControl, Initializable {
     // ====USDC Contract ADDRESS=====
     address public USDC;
 
+    uint256 public minimumAmountToDisburse = 500; //
+    Donation[] public undisburedDonations;
+    uint256 public undisburedAmount = 0;
     // ====Acceptable Tokens========
     mapping(address => bool) public approvedTokens;
+    mapping(uint256 => uint256) public claimBadgesForDonors;
+    //===== STRUCTS =====
+    struct Donation {
+        address donor;
+        uint256 donorId;
+        uint256 amount;
+        uint256[] categories;
+    }
+
     // ==== ON-DISBURSED ====
-    event Disbursed(
+    event Disbursed(uint256 amount, Donation[] donations);
+
+    // ==== DONATION =====
+    event Donated(
         address indexed donor,
-        uint256 amount,
-        address[] indexed beneficiaries,
-        uint256[] indexed categories
+        uint256 indexed amount,
+        uint256 donorId,
+        uint256 previousUndisbursedBalance,
+        uint256 currentUndisbursedBalance,
+        uint256[] indexed categories,
+        uint256 minimumAmountToDisburse
     );
+
     // ==== ON-TOKEN_APPROVAL =====
     event ApproveToken(address indexed contractAddress);
 
@@ -179,10 +195,12 @@ contract MaraScan is AccessControl, Initializable {
      * @param _beneficiaries: list of benefiaries addresses
      * @param _category: Category of benefiaries
      */
-    function recieveFromCircle(
+    function donationFromCircle(
         uint256 _amount,
+        uint256 _donorId,
         address[] calldata _beneficiaries,
-        uint256[] calldata _category
+        uint256[] calldata _category,
+        bool disburse
     ) external onlyMasterWallet {
         ERC20 token = ERC20(USDC);
         require(
@@ -190,8 +208,26 @@ contract MaraScan is AccessControl, Initializable {
             "Amount to disburse exceeds balance"
         );
 
+        uint256 previousUndisbursedBalance = undisburedAmount;
+        undisburedAmount += _amount;
+
+        emit Donated(
+            msg.sender,
+            _amount,
+            _donorId,
+            previousUndisbursedBalance,
+            undisburedAmount,
+            _category,
+            minimumAmountToDisburse
+        );
+        claimBadgesForDonors[_donorId] = claimBadgesForDonors[_donorId] + 1;
+        undisburedDonations.push(
+            Donation(msg.sender, _donorId, _amount, _category)
+        );
+        if (disburse) {
+            _disburseToken(USDC, undisburedAmount, _beneficiaries, _category);
+        }
         // Disburesement
-        _disburseToken(USDC, _amount, _beneficiaries, _category);
     }
 
     /**
@@ -201,11 +237,13 @@ contract MaraScan is AccessControl, Initializable {
      * @param _beneficiaries: list of benefiaries addresses
      * @param _category: Category of benefiaries
      */
-    function donateAndDisburseToken(
+    function donate(
         address _tokenAddress,
         uint256 _amount,
+        uint256 _donorId,
         address[] calldata _beneficiaries,
-        uint256[] calldata _category
+        uint256[] calldata _category,
+        bool disburse
     ) external {
         require(
             _tokenAddress == USDC,
@@ -220,13 +258,37 @@ contract MaraScan is AccessControl, Initializable {
         // send tokens to contract
         // it requires approval
         token.transferFrom(msg.sender, address(this), _amount);
+        uint256 previousUndisbursedBalance = undisburedAmount;
+        undisburedAmount += _amount;
 
+        undisburedDonations.push(
+            Donation(msg.sender, _donorId, _amount, _category)
+        );
+
+        //  mint badge
+        IBadges(BADGE).mintBadge(0, msg.sender, 1);
+        emit Donated(
+            msg.sender,
+            _amount,
+            _donorId,
+            previousUndisbursedBalance,
+            undisburedAmount,
+            _category,
+            minimumAmountToDisburse
+        );
+        if (disburse) {
+            _disburseToken(
+                _tokenAddress,
+                undisburedAmount,
+                _beneficiaries,
+                _category
+            );
+        }
         // Disburesement
-        _disburseToken(_tokenAddress, _amount, _beneficiaries, _category);
     }
 
     /**
-     * @dev Recieves ETH, Swap to USDC and disburse equally to Beneficiaries
+     * @dev Recieves ETH, Swap to USDC and disburse? equally to Beneficiaries
      * @param amountOut: Minimum amount of USDC to receive
      * @param _beneficiaries: list of benefiaries addresses
      * @param _category: Category of benefiaries
@@ -234,7 +296,9 @@ contract MaraScan is AccessControl, Initializable {
     function SwapExactETHForTokens(
         uint256 amountOut,
         address[] calldata _beneficiaries,
-        uint256[] calldata _category
+        uint256 _donorId,
+        uint256[] calldata _category,
+        bool disburse
     ) external payable {
         address[] memory path = new address[](2);
         path[0] = uniswapRouter.WETH();
@@ -243,7 +307,27 @@ contract MaraScan is AccessControl, Initializable {
             value: msg.value
         }(amountOut, path, address(this), block.timestamp + 50);
 
-        _disburseToken(USDC, swapResult[1], _beneficiaries, _category);
+        uint256 previousUndisbursedBalance = undisburedAmount;
+        undisburedAmount += swapResult[1];
+        undisburedDonations.push(
+            Donation(msg.sender, _donorId, swapResult[1], _category)
+        );
+
+        //  mint badge
+        IBadges(BADGE).mintBadge(0, msg.sender, 1);
+        emit Donated(
+            msg.sender,
+            swapResult[1],
+            _donorId,
+            previousUndisbursedBalance,
+            undisburedAmount,
+            _category,
+            minimumAmountToDisburse
+        );
+        // Disburesement
+        if (disburse) {
+            _disburseToken(USDC, undisburedAmount, _beneficiaries, _category);
+        }
     }
 
     /**
@@ -259,7 +343,9 @@ contract MaraScan is AccessControl, Initializable {
         uint256 amountOutMin,
         address tokenIn,
         address[] calldata _beneficiaries,
-        uint256[] calldata _category
+        uint256[] calldata _category,
+        uint256 _donorId,
+        bool disburse
     ) external {
         require(
             approvedTokens[tokenIn],
@@ -278,20 +364,33 @@ contract MaraScan is AccessControl, Initializable {
 
         // approve uniswap router on this token
         thisContract.approve(address(uniswapRouter), amountIn);
-        uniswapRouter.swapExactTokensForTokens(
+        uint256[] memory swapResult = uniswapRouter.swapExactTokensForTokens(
             amountIn,
             amountOutMin,
             path,
             address(this),
             block.timestamp + 50
         );
-
-        _disburseToken(
-            USDC,
-            ERC20(USDC).balanceOf(address(this)),
-            _beneficiaries,
-            _category
+        uint256 previousUndisbursedBalance = undisburedAmount;
+        undisburedAmount += swapResult[1];
+        undisburedDonations.push(
+            Donation(msg.sender, _donorId, swapResult[1], _category)
         );
+        // mint badge
+        IBadges(BADGE).mintBadge(0, msg.sender, 1);
+        emit Donated(
+            msg.sender,
+            swapResult[1],
+            _donorId,
+            previousUndisbursedBalance,
+            undisburedAmount,
+            _category,
+            minimumAmountToDisburse
+        );
+        // Disburesement
+        if (disburse) {
+            _disburseToken(USDC, undisburedAmount, _beneficiaries, _category);
+        }
     }
 
     function _disburseToken(
@@ -310,14 +409,24 @@ contract MaraScan is AccessControl, Initializable {
                 "Unable to transfer token"
             );
         }
-        // Disbursement ends
 
-        // Mint Badge
-        IBadges(BADGE).mintBadge(0, msg.sender);
-        emit Disbursed(msg.sender, _amount, _beneficiaries, _category);
+        emit Disbursed(undisburedAmount, undisburedDonations);
+
+        // reset undisburedAmount
+        undisburedAmount = 0;
+        delete undisburedDonations;
+        // Disbursement ends
     }
 
- 
+    // Claim Badge
+    function claimBadge(uint256 donorId) public {
+        require(claimBadgesForDonors[donorId] > 0, "You don't have any clais");
+
+        //  mint badge
+        IBadges(BADGE).mintBadge(0, msg.sender, claimBadgesForDonors[donorId]);
+
+        claimBadgesForDonors[donorId] = 0;
+    }
 
     function approveTokenForDonation(address _tokenAddress)
         public

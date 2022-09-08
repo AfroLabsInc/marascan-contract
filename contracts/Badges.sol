@@ -9,8 +9,8 @@ contract DonorBadges is ERC1155, IBadges {
         )
     {}
 
-    function mintBadge(uint256 id, address to) external {
-        _mint(to, id, 1, "");
+    function mintBadge(uint256 id, address to, uint256 amount) external {
+        _mint(to, id, amount, "");
     }
 
 
