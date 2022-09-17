@@ -176,7 +176,7 @@ contract USDCWithrawal is AccessControl, Initializable {
 
     // ==== EVENTS ====
     event UserWithdrawal(
-        address indexed donor,
+        address indexed beneficiary,
         uint256 amount
     );
 
