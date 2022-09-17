@@ -160,7 +160,7 @@ contract MaraScan is AccessControl, Initializable {
     event Donated(
         address indexed donor,
         uint256 indexed amount,
-        uint256 donorId,
+        uint256 donationRequestId,
         uint256 previousUndisbursedBalance,
         uint256 currentUndisbursedBalance,
         uint256[] indexed categories,
@@ -200,7 +200,7 @@ contract MaraScan is AccessControl, Initializable {
      */
     function donationFromCircle(
         uint256 _amount,
-        uint256 _donationId,
+        uint256 _donationRequestId,
         address[] calldata _beneficiaries,
         uint256[] calldata _category,
         bool disburse
@@ -217,17 +217,17 @@ contract MaraScan is AccessControl, Initializable {
         emit Donated(
             msg.sender,
             _amount,
-            _donationId,
+            _donationRequestId,
             previousUndisbursedBalance,
             unDisbursedAmount,
             _category,
             minimumAmountToDisburse
         );
-        claimBadgesForDonors[_donationId] =
-            claimBadgesForDonors[_donationId] +
+        claimBadgesForDonors[_donationRequestId] =
+            claimBadgesForDonors[_donationRequestId] +
             1;
         unDisbursedDonations.push(
-            Donation(msg.sender, _donationId, _amount, _category)
+            Donation(msg.sender, _donationRequestId, _amount, _category)
         );
         if (disburse) {
             _disburseToken(USDC, unDisbursedAmount, _beneficiaries, _category);
@@ -245,7 +245,7 @@ contract MaraScan is AccessControl, Initializable {
     function donate(
         address _tokenAddress,
         uint256 _amount,
-        uint256 _donationId,
+        uint256 _donationRequestId,
         address[] calldata _beneficiaries,
         uint256[] calldata _category,
         bool disburse
@@ -267,7 +267,7 @@ contract MaraScan is AccessControl, Initializable {
         unDisbursedAmount += _amount;
 
         unDisbursedDonations.push(
-            Donation(msg.sender, _donationId, _amount, _category)
+            Donation(msg.sender, _donationRequestId, _amount, _category)
         );
 
         //  mint badge
@@ -275,7 +275,7 @@ contract MaraScan is AccessControl, Initializable {
         emit Donated(
             msg.sender,
             _amount,
-            _donationId,
+            _donationRequestId,
             previousUndisbursedBalance,
             unDisbursedAmount,
             _category,
@@ -301,7 +301,7 @@ contract MaraScan is AccessControl, Initializable {
     function SwapExactETHForTokens(
         uint256 amountOut,
         address[] calldata _beneficiaries,
-        uint256 _donationId,
+        uint256 _donationRequestId,
         uint256[] calldata _category,
         bool disburse
     ) external payable {
@@ -315,7 +315,7 @@ contract MaraScan is AccessControl, Initializable {
         uint256 previousUndisbursedBalance = unDisbursedAmount;
         unDisbursedAmount += swapResult[1];
         unDisbursedDonations.push(
-            Donation(msg.sender, _donationId, swapResult[1], _category)
+            Donation(msg.sender, _donationRequestId, swapResult[1], _category)
         );
 
         //  mint badge
@@ -323,7 +323,7 @@ contract MaraScan is AccessControl, Initializable {
         emit Donated(
             msg.sender,
             swapResult[1],
-            _donationId,
+            _donationRequestId,
             previousUndisbursedBalance,
             unDisbursedAmount,
             _category,
@@ -349,7 +349,7 @@ contract MaraScan is AccessControl, Initializable {
         address tokenIn,
         address[] calldata _beneficiaries,
         uint256[] calldata _category,
-        uint256 _donationId,
+        uint256 _donationRequestId,
         bool disburse
     ) external {
         require(
@@ -379,14 +379,14 @@ contract MaraScan is AccessControl, Initializable {
         uint256 previousUndisbursedBalance = unDisbursedAmount;
         unDisbursedAmount += swapResult[1];
         unDisbursedDonations.push(
-            Donation(msg.sender, _donationId, swapResult[1], _category)
+            Donation(msg.sender, _donationRequestId, swapResult[1], _category)
         );
         // mint badge
         IBadges(BADGE).mintBadge(0, msg.sender, 1);
         emit Donated(
             msg.sender,
             swapResult[1],
-            _donationId,
+            _donationRequestId,
             previousUndisbursedBalance,
             unDisbursedAmount,
             _category,
