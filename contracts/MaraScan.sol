@@ -150,12 +150,11 @@ contract MaraScan is AccessControl, Initializable {
         address donor;
         uint256 donationRequestId;
         uint256 amount;
-        uint256[] categories;
-        Beneficiary[] beneficiaries;
+        Beneficiary beneficiaries;
     }
     struct Beneficiary {
-        address beneficiary;
-        uint256 amount;
+        address[] beneficiary;
+        uint256[] amount;
     }
     // ==== ON-DISBURSED ====
     event Disbursed(Donation donation);
@@ -165,11 +164,8 @@ contract MaraScan is AccessControl, Initializable {
         address indexed donor,
         uint256 indexed amount,
         uint256 donationRequestId,
-        uint256 previousUndisbursedBalance,
         uint256 currentUndisbursedBalance,
-        uint256[] indexed categories,
-        uint256 minimumAmountToDisburse,
-        Beneficiary[] benefiaries
+        Beneficiary benefiaries
     );
 
     // ==== ON-TOKEN_APPROVAL =====
@@ -202,13 +198,12 @@ contract MaraScan is AccessControl, Initializable {
      * @notice Disburses th Recieved USDC token and disburse equally to Beneficiaries
      * @param _amount: amount of Token( USDC) to donate
      * @param _beneficiaries: list of benefiaries addresses
-     * @param _category: Category of benefiaries
      */
     function donationFromCircle(
         uint256 _amount,
         uint256 _donationRequestId,
-        Beneficiary[] calldata _beneficiaries,
-        uint256[] calldata _category,
+        address[] calldata _beneficiaries,
+        uint256[] calldata _amountPerBeneficiary,
         bool disburse
     ) external onlyMasterWallet {
         ERC20 token = ERC20(USDC);
@@ -217,31 +212,31 @@ contract MaraScan is AccessControl, Initializable {
             "Amount to disburse exceeds balance"
         );
 
-        uint256 previousUndisbursedBalance = unDisbursedAmount;
-        unDisbursedAmount += _amount;
+        // Beneficiary[] storage beneficiaries;
 
-        emit Donated(
-            msg.sender,
-            _amount,
-            _donationRequestId,
-            previousUndisbursedBalance,
-            unDisbursedAmount,
-            _category,
-            minimumAmountToDisburse,
-            _beneficiaries
-        );
-        claimBadgesForDonors[_donationRequestId] =
-            claimBadgesForDonors[_donationRequestId] +
-            1;
+        // for (uint256 index = 0; index < _beneficiaries.length; index++) {
+        //     beneficiaries.push(
+        //         Beneficiary(_beneficiaries[index], _amountPerBeneficiary[index])
+        //     );
+        // }
+        unDisbursedAmount += _amount;
         unDisbursedDonations.push(
             Donation(
                 msg.sender,
                 _donationRequestId,
                 _amount,
-                _category,
-                _beneficiaries
+                Beneficiary(_beneficiaries, _amountPerBeneficiary)
             )
         );
+
+        emit Donated(
+            msg.sender,
+            _amount,
+            _donationRequestId,
+            unDisbursedAmount,
+            Beneficiary(_beneficiaries, _amountPerBeneficiary)
+        );
+        // // Disburesement
         if (disburse) {
             _disburseToken(unDisbursedDonations);
         }
@@ -253,14 +248,13 @@ contract MaraScan is AccessControl, Initializable {
      * @param _tokenAddress: The Contract address of USDC
      * @param _amount: amount of Token( USDC) to donate
      * @param _beneficiaries: list of benefiaries addresses
-     * @param _category: Category of benefiaries
      */
     function donate(
         address _tokenAddress,
         uint256 _amount,
         uint256 _donationRequestId,
-        Beneficiary[] calldata _beneficiaries,
-        uint256[] calldata _category,
+        address[] calldata _beneficiaries,
+        uint256[] calldata _amountPerBeneficiary,
         bool disburse
     ) external {
         require(
@@ -277,35 +271,27 @@ contract MaraScan is AccessControl, Initializable {
         // it requires approval
 
         token.transferFrom(msg.sender, address(this), _amount);
-        uint256 previousUndisbursedBalance = unDisbursedAmount;
-        unDisbursedAmount += _amount;
 
+        unDisbursedAmount += _amount;
         unDisbursedDonations.push(
             Donation(
                 msg.sender,
                 _donationRequestId,
                 _amount,
-                _category,
-                _beneficiaries
+                Beneficiary(_beneficiaries, _amountPerBeneficiary)
             )
         );
 
-        // //  mint badge
-        // // IBadges(BADGE).mintBadge(0, msg.sender, 1);
         emit Donated(
             msg.sender,
             _amount,
             _donationRequestId,
-            previousUndisbursedBalance,
             unDisbursedAmount,
-            _category,
-            minimumAmountToDisburse,
-            _beneficiaries
+            Beneficiary(_beneficiaries, _amountPerBeneficiary)
         );
+        // // Disburesement
         if (disburse) {
-            _disburseToken(
-                unDisbursedDonations
-            );
+            _disburseToken(unDisbursedDonations);
         }
         // Disburesement
     }
@@ -314,13 +300,12 @@ contract MaraScan is AccessControl, Initializable {
      * @dev Recieves ETH, Swap to USDC and disburse? equally to Beneficiaries
      * @param amountOut: Minimum amount of USDC to receive
      * @param _beneficiaries: list of benefiaries addresses
-     * @param _category: Category of benefiaries
      */
     function SwapExactETHForTokens(
         uint256 amountOut,
-        Beneficiary[] calldata _beneficiaries,
+        address[] calldata _beneficiaries,
+        uint256[] calldata _amountPerBeneficiary,
         uint256 _donationRequestId,
-        uint256[] calldata _category,
         bool disburse
     ) external payable {
         address[] memory path = new address[](2);
@@ -330,15 +315,13 @@ contract MaraScan is AccessControl, Initializable {
             value: msg.value
         }(amountOut, path, address(this), block.timestamp + 50);
 
-        uint256 previousUndisbursedBalance = unDisbursedAmount;
         unDisbursedAmount += swapResult[1];
         unDisbursedDonations.push(
             Donation(
                 msg.sender,
                 _donationRequestId,
                 swapResult[1],
-                _category,
-                _beneficiaries
+                Beneficiary(_beneficiaries, _amountPerBeneficiary)
             )
         );
 
@@ -346,11 +329,8 @@ contract MaraScan is AccessControl, Initializable {
             msg.sender,
             swapResult[1],
             _donationRequestId,
-            previousUndisbursedBalance,
             unDisbursedAmount,
-            _category,
-            minimumAmountToDisburse,
-            _beneficiaries
+            Beneficiary(_beneficiaries, _amountPerBeneficiary)
         );
         // // Disburesement
         if (disburse) {
@@ -364,14 +344,13 @@ contract MaraScan is AccessControl, Initializable {
      * @param amountIn: amount of Tokens to swap to USDC
      * @param amountOutMin: Minimum amount of USDC to receive
      * @param _beneficiaries: list of benefiaries addresses
-     * @param _category: Category of benefiaries
      */
     function swapExactTokensForTokens(
         uint256 amountIn,
         uint256 amountOutMin,
         address tokenIn,
-        Beneficiary[] calldata _beneficiaries,
-        uint256[] calldata _category,
+        address[] calldata _beneficiaries,
+        uint256[] calldata _amountPerBeneficiary,
         uint256 _donationRequestId,
         bool disburse
     ) external {
@@ -399,59 +378,51 @@ contract MaraScan is AccessControl, Initializable {
             address(this),
             block.timestamp + 50
         );
-        uint256 previousUndisbursedBalance = unDisbursedAmount;
+        unDisbursedAmount += swapResult[1];
+        
         unDisbursedAmount += swapResult[1];
         unDisbursedDonations.push(
             Donation(
                 msg.sender,
                 _donationRequestId,
                 swapResult[1],
-                _category,
-                _beneficiaries
+                Beneficiary(_beneficiaries, _amountPerBeneficiary)
             )
         );
-        // mint badge
-        // IBadges(BADGE).mintBadge(0, msg.sender, 1);
+
         emit Donated(
             msg.sender,
             swapResult[1],
             _donationRequestId,
-            previousUndisbursedBalance,
             unDisbursedAmount,
-            _category,
-            minimumAmountToDisburse,
-            _beneficiaries
+            Beneficiary(_beneficiaries, _amountPerBeneficiary)
         );
-        // Disburesement
+        // // Disburesement
         if (disburse) {
-            _disburseToken(
-                unDisbursedDonations
-            );
+            _disburseToken(unDisbursedDonations);
         }
     }
 
-    function disburseToken() external onlyMasterWallet() {
+    function disburseToken() external onlyMasterWallet {
         require(unDisbursedAmount >= 0, "No Donation to disburse");
         // uint256 amountPerBeneficiary = _amount / _beneficiaries.length;
         for (uint256 index = 0; index < unDisbursedDonations.length; index++) {
-            Donation storage donation = unDisbursedDonations[index];
+            Donation memory donation = unDisbursedDonations[index];
             for (
                 uint256 i = 0;
-                index < donation.beneficiaries.length;
+                index < donation.beneficiaries.beneficiary.length;
                 index++
             ) {
                 require(
                     ERC20(USDC).transfer(
-                        donation.beneficiaries[i].beneficiary,
-                        donation.beneficiaries[i].amount
+                       donation.beneficiaries.beneficiary[i],
+                        donation.beneficiaries.amount[i]
                     ),
                     "Unable to transfer token"
                 );
             }
             emit Disbursed(donation);
         }
-
-        
 
         for (uint256 index = 0; index < unDisbursedDonations.length; index++) {
             allDisbursedDonations.push(unDisbursedDonations[index]);
@@ -464,27 +435,25 @@ contract MaraScan is AccessControl, Initializable {
         // Disbursement ends
     }
 
-        function _disburseToken(Donation[] storage donations) internal {
+    function _disburseToken(Donation[] memory donations) internal {
         // uint256 amountPerBeneficiary = _amount / _beneficiaries.length;
         for (uint256 index = 0; index < donations.length; index++) {
-            Donation storage donation = donations[index];
+            Donation memory donation = donations[index];
             for (
                 uint256 i = 0;
-                index < donation.beneficiaries.length;
+                index < donation.beneficiaries.beneficiary.length;
                 index++
             ) {
                 require(
                     ERC20(USDC).transfer(
-                        donation.beneficiaries[i].beneficiary,
-                        donation.beneficiaries[i].amount
+                        donation.beneficiaries.beneficiary[i],
+                        donation.beneficiaries.amount[i]
                     ),
                     "Unable to transfer token"
                 );
             }
             emit Disbursed(donation);
         }
-
-        
 
         for (uint256 index = 0; index < donations.length; index++) {
             allDisbursedDonations.push(donations[index]);
