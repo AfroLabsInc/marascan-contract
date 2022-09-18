@@ -2,7 +2,8 @@
   "name": "hardhat-project",
   "scripts": {
     "commit": "cz",
-    "deploy": "npx hardhat run scripts/deploy.ts --network goerly"
+    "deploy": "npx hardhat run scripts/deploy.ts --network goerly",
+    "verify": "npx hardhat run scripts/verify.ts --network goerly"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
