@@ -96,20 +96,18 @@ contract MaraScan is AccessControl, Initializable {
         uniswapRouter = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
         minimumAmountToDisburse = 500;
         USDC = 0x07865c6E87B9F70255377e024ace6630C1Eaa37F;
-        processingFeePercent = 5;
+        processingFeePercent = 2;
     }
 
     /**
      * @notice Disburses th Recieved USDC token and disburse equally to Beneficiaries
      * @param _amount: amount of Token( USDC) to donate
-     * @param _beneficiaries: list of benefiaries addresses
+     * @param _donationDetails: list of benefiaries addresses
      */
     function donationFromCircle(
         uint256 _amount,
         uint256 _donationRequestId,
-        address[] calldata _beneficiaries,
-        uint256[] calldata _amountPerBeneficiary,
-        bool disburse
+        Beneficiary calldata _donationDetails
     ) external onlyMasterWallet {
         ERC20 token = ERC20(USDC);
         require(
@@ -131,7 +129,10 @@ contract MaraScan is AccessControl, Initializable {
                 msg.sender,
                 _donationRequestId,
                 actualAmount,
-                Beneficiary(_beneficiaries, _amountPerBeneficiary)
+                Beneficiary(
+                    _donationDetails.beneficiaryAddresses,
+                    _donationDetails.amount
+                )
             )
         );
 
@@ -140,12 +141,12 @@ contract MaraScan is AccessControl, Initializable {
             _amount,
             _donationRequestId,
             unDisbursedAmount,
-            Beneficiary(_beneficiaries, _amountPerBeneficiary)
+            Beneficiary(
+                _donationDetails.beneficiaryAddresses,
+                _donationDetails.amount
+            )
         );
-        // // Disburesement
-        if (disburse) {
-            _disburseToken();
-        }
+
         // Disburesement
     }
 
@@ -158,8 +159,7 @@ contract MaraScan is AccessControl, Initializable {
         uint256 _amount,
         uint256 _donationRequestId,
         Beneficiary calldata _donationDetails,
-        bytes32 secretKey,
-        bool disburse
+        bytes32 secretKey
     ) external {
         require(secretKey == secret, "Unauthorized caller");
 
@@ -201,10 +201,7 @@ contract MaraScan is AccessControl, Initializable {
                 _donationDetails.amount
             )
         );
-        // // Disburesement
-        if (disburse) {
-            _disburseToken();
-        }
+        // _disburseToken();
         // Disburesement
     }
 
@@ -216,8 +213,7 @@ contract MaraScan is AccessControl, Initializable {
         uint256 amountOut,
         uint256 _donationRequestId,
         Beneficiary calldata _donationDetails,
-        bytes32 secretKey,
-        bool disburse
+        bytes32 secretKey
     ) external payable {
         require(secretKey == secret, "Unauthorized caller");
         address[] memory path = new address[](2);
@@ -254,10 +250,6 @@ contract MaraScan is AccessControl, Initializable {
                 _donationDetails.amount
             )
         );
-        // // Disburesement
-        if (disburse) {
-            _disburseToken();
-        }
     }
 
     /**
@@ -270,7 +262,7 @@ contract MaraScan is AccessControl, Initializable {
         address tokenIn,
         Beneficiary calldata _donationDetails,
         uint256 _donationRequestId,
-        bool disburse,
+        // bool disburse,
         bytes32 secretKey
     ) external {
         require(secretKey == secret, "Unauthorized caller");
@@ -325,15 +317,10 @@ contract MaraScan is AccessControl, Initializable {
                 _donationDetails.amount
             )
         );
-        // // Disburesement
-        if (disburse) {
-            _disburseToken();
-        }
     }
 
-
     function _disburseToken() internal {
-          require(unDisbursedAmount >= 0, "No Donation to disburse");
+        require(unDisbursedAmount >= 0, "No Donation to disburse");
         // uint256 amountPerBeneficiary = _amount / _beneficiaries.length;
         for (uint256 index = 0; index < unDisbursedDonations.length; index++) {
             Donation memory donation = unDisbursedDonations[index];
@@ -367,10 +354,10 @@ contract MaraScan is AccessControl, Initializable {
         // Disbursement ends
     }
 
-
     function disburseToken() external onlyMasterWallet {
         _disburseToken();
     }
+
     // Claim Badge
     function claimBadge(uint256 donationRequestId) public {
         require(
