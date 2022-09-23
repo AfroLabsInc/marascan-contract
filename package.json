@@ -3,7 +3,9 @@
   "scripts": {
     "commit": "cz",
     "deploy": "npx hardhat run scripts/deploy.ts --network goerly",
-    "verify": "npx hardhat run scripts/verify.ts --network goerly"
+    "deployO": "npx hardhat run scripts/deployOperations.ts --network goerly",
+    "verify": "npx hardhat run scripts/verify.ts --network goerly",
+    "simulate": "npx hardhat run scripts/simulate.ts --network goerly"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
@@ -17,6 +19,7 @@
     }
   },
   "dependencies": {
+    "@metamask/eth-sig-util": "^5.0.0",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
