@@ -15,7 +15,7 @@ const main = async () => {
   const withdrawal = new ContractFactory(abi.abi, abi.bytecode, signer);
 
   const MaraScanOperations = await withdrawal.attach(
-    '0x7adf4b682f671b0B6Ff5dF349d4AD5671c765c7f'
+    '0xB69a9486376ED4f345Bb08005283C602a8eB8C96'
   );
   //   console.log(withdrawal.withdrawFromUser())
   const valueBefore = Math.floor(Date.now() / 1000) + 3600;
@@ -46,7 +46,7 @@ const main = async () => {
     primaryType: 'TransferWithAuthorization',
     message: {
       from: '0xF10dc6fee78b300A5B3AB9cc9470264265a2d6Af',
-      to: '0x7adf4b682f671b0B6Ff5dF349d4AD5671c765c7f',
+      to: '0xB69a9486376ED4f345Bb08005283C602a8eB8C96',
       value: 129252,
       validAfter: 0,
       validBefore: valueBefore, // Valid for an hour
