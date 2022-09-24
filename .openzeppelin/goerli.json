@@ -134,6 +134,11 @@
       "address": "0x21e1b2c9FdEeb1Fca78FbdD3aE5C16a8Ed8Bf801",
       "txHash": "0x2afdcf219bdc1570fd45a3288fe9bfc0c21214439558186706cef2d8ffae0d5a",
       "kind": "transparent"
+    },
+    {
+      "address": "0x203A0e564f5d45B31ae820F4BBf7621861518b59",
+      "txHash": "0x936d71d1c3c048dfa298e6ac57bd4342d48ff0b14b6582a6587312c368e3a299",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -2695,6 +2700,269 @@
               }
             ],
             "numberOfBytes": "160"
+          },
+          "t_struct(RoleData)413_storage": {
+            "label": "struct AccessControl.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "ac1b30126114e3312a6dd2de77beddfc5edf58778e87f160296445d2bd59b787": {
+      "address": "0xde518F5e57b68303f205C0C647CB84470fF75eE1",
+      "txHash": "0x248223fe6a34753c6d112b48ca1790102b96320574e1c8ac0f4334b8acd55f06",
+      "layout": {
+        "storage": [
+          {
+            "label": "_roles",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)413_storage)",
+            "contract": "AccessControl",
+            "src": "@openzeppelin/contracts/access/AccessControl.sol:55"
+          },
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "1",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "uniswapRouter",
+            "offset": 2,
+            "slot": "1",
+            "type": "t_contract(IUniswapV2Router02)2848",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:28"
+          },
+          {
+            "label": "MASTER_WALLET",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:30"
+          },
+          {
+            "label": "BADGE",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_address",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:35"
+          },
+          {
+            "label": "USDC",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_address",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:38"
+          },
+          {
+            "label": "secret",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_bytes32",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:40"
+          },
+          {
+            "label": "minimumAmountToDisburse",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint256",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:42"
+          },
+          {
+            "label": "allDisbursedDonations",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_array(t_struct(Donation)3043_storage)dyn_storage",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:44"
+          },
+          {
+            "label": "unDisbursedDonations",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_array(t_struct(Donation)3043_storage)dyn_storage",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:45"
+          },
+          {
+            "label": "unDisbursedAmount",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_uint256",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:46"
+          },
+          {
+            "label": "totalAmountDisbursed",
+            "offset": 0,
+            "slot": "10",
+            "type": "t_uint256",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:47"
+          },
+          {
+            "label": "processingFeePercent",
+            "offset": 0,
+            "slot": "11",
+            "type": "t_uint256",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:48"
+          },
+          {
+            "label": "approvedTokens",
+            "offset": 0,
+            "slot": "12",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:50"
+          },
+          {
+            "label": "claimBadgesForDonors",
+            "offset": 0,
+            "slot": "13",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:51"
+          },
+          {
+            "label": "donationRequestBeneficiaries",
+            "offset": 0,
+            "slot": "14",
+            "type": "t_mapping(t_uint256,t_array(t_struct(BeneficiaryOutput)3053_storage)dyn_storage)",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:52"
+          },
+          {
+            "label": "beneficiary",
+            "offset": 0,
+            "slot": "15",
+            "type": "t_array(t_struct(BeneficiaryOutput)3053_storage)dyn_storage",
+            "contract": "MaraScan",
+            "src": "contracts/MaraScan.sol:70"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_struct(BeneficiaryOutput)3053_storage)dyn_storage": {
+            "label": "struct MaraScan.BeneficiaryOutput[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_struct(Donation)3043_storage)dyn_storage": {
+            "label": "struct MaraScan.Donation[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IUniswapV2Router02)2848": {
+            "label": "contract IUniswapV2Router02",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)413_storage)": {
+            "label": "mapping(bytes32 => struct AccessControl.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(BeneficiaryOutput)3053_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct MaraScan.BeneficiaryOutput[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(BeneficiaryOutput)3053_storage": {
+            "label": "struct MaraScan.BeneficiaryOutput",
+            "members": [
+              {
+                "label": "beneficiaryAddresses",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amountPerBeneficiary",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Donation)3043_storage": {
+            "label": "struct MaraScan.Donation",
+            "members": [
+              {
+                "label": "donor",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "donationRequestId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
           },
           "t_struct(RoleData)413_storage": {
             "label": "struct AccessControl.RoleData",
