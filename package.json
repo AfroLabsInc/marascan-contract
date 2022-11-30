@@ -5,7 +5,8 @@
     "deploy": "npx hardhat run scripts/deploy.ts --network goerly",
     "deployO": "npx hardhat run scripts/deployOperations.ts --network goerly",
     "verify": "npx hardhat run scripts/verify.ts --network goerly",
-    "simulate": "npx hardhat run scripts/simulate.ts --network goerly"
+    "simulate": "npx hardhat run scripts/simulate.ts --network goerly",
+    "simulateM": "npx hardhat run scripts/simulateMain.ts --network goerly"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
