@@ -1,11 +1,11 @@
 # MaraScan Contract
-This contract was written in purpose of a Hackathon. Security issues may not be analyzed correctly, use cautiosly
+This contract was written in purpose of a Hackathon. use cautiosly
 
 
 ## Concepts of the MaraScan Contract?
 - It is an upgradeable UUPS contract
 - Accepts USDC (central cuurency) Token from donor and disbures equally to beneficiaries
-- Accepts ETH from donor, swaps Exact ETH to USDC and disbures equally to beneficiaries
+- Accepts MATIC from donor, swaps Exact MATIC to USDC and disbures equally to beneficiaries
 - Accepts anyother approved tokens and swap Exact Token to USDC and disbures equally to beneficiaries
 
 ### Disburesement
@@ -33,7 +33,7 @@ function _disburseToken(
         emit Disbursed(msg.sender, _amount, _beneficiaries);
     }
 ```
-Upon disbursement of USDC, an ERC1155 is minted to Donor.
+Upon disbursement of USDC, an ERC1155 NFT is minted to Donor.
 
 ```typescript
     IBadges(BADGE).mintBadge(0, msg.sender, _category);
