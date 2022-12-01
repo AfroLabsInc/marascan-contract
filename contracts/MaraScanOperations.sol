@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
 /**
   
-  #     #     #       ######  #     #     #######  #     #  #######       ##    ##     #      #####       #      
-  #     #    # #    #         #    #         #     #     #  #             # #  # #    # #     #    #     # #           
-  #######   #####   #         #####          #     #######  #######       #  ##  #   #####    #####     #####        
-  #     #  #     #  #         #    #         #     #     #  #             #      #  #     #   #    #   #     #          
-  #     # #       #  #######  #     #        #     #     #  #######       #      # #       #  #     # #       # 
-  
-  @title A Hack The Mara Hackathon Project
-  @author The name of the author
-  @notice This handles collections and disbursements of funds as USDC to beneficiaries
+            #     #     #       ######  #     #     #    #######  #     #   #####  ##      #   
+            #     #    # #    #         #    #     # #      #     #     # #      # # #     #        
+            #######   #####   #         #####     #####     #     ####### #      # #   #   #      
+            #     #  #     #  #         #    #   #     #    #     #     # #      # #    #  #         
+            #     # #       #  #######  #     # #       #   #     #     #  ######  #      ##    
+  @title A Hackathon Project
+  @author John Oba  <@johnexzy> and  Anthony Nwobodo <@francosion042>
+  @notice This handles Withrawal and Automatic Market Maker with Circle.
   @notice This cotract is not audited and only written for the purpose of a Hackathon, take caution
   */
 
@@ -52,9 +51,23 @@ contract MaraScanOperations is AccessControl, Initializable {
      **/
     function initialize() public initializer {
         _setupRole(ADMIN_ROLE, msg.sender);
-        USDC = 0x07865c6E87B9F70255377e024ace6630C1Eaa37F;
-        MASTER_WALLET = 0xF10dc6fee78b300A5B3AB9cc9470264265a2d6Af;
+        USDC = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
+        MASTER_WALLET = msg.sender;
     }
+
+    /**
+     * 
+     * @notice Execute a transfer with a signed authorization
+     * @param from          Payer's address (Authorizer)
+     * @param to            Payee's address
+     * @param value         Amount to be transferred
+     * @param validAfter    The time after which this is valid (unix time)
+     * @param validBefore   The time before which this is valid (unix time)
+     * @param nonce         Unique nonce
+     * @param v             v of the signature
+     * @param r             r of the signature
+     * @param s             s of the signature
+     */
 
     function _gaslessTransfer(
         address from,
@@ -82,6 +95,14 @@ contract MaraScanOperations is AccessControl, Initializable {
         return true;
     }
 
+    /**
+     * @notice Returns the state of an authorization
+     * @dev Nonces are randomly generated 32-byte data unique to the authorizer's
+     * address
+     * @param authorizer    Authorizer's address
+     * @param nonce         Nonce of the authorization
+     * @return True if the nonce is used
+     */
     function authorizationState(address authorizer, bytes32 nonce)
         external
         view

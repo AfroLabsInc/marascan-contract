@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0
 /**
   
-  #     #     #       ######  #     #     #######  #     #  #######       ##    ##     #      #####       #      
-  #     #    # #    #         #    #         #     #     #  #             # #  # #    # #     #    #     # #           
-  #######   #####   #         #####          #     #######  #######       #  ##  #   #####    #####     #####        
-  #     #  #     #  #         #    #         #     #     #  #             #      #  #     #   #    #   #     #          
-  #     # #       #  #######  #     #        #     #     #  #######       #      # #       #  #     # #       # 
-  
-  @title A Hack The Mara Hackathon Project
-  @author The name of the author
-  @notice This handles collections and disbursements of funds as USDC to beneficiaries
-  @notice This cotract is not audited and only written for the purpose of a Hackathon, take caution
+            #     #     #       ######  #     #     #    #######  #     #   #####  ##      #   
+            #     #    # #    #         #    #     # #      #     #     # #      # # #     #        
+            #######   #####   #         #####     #####     #     ####### #      # #   #   #      
+            #     #  #     #  #         #    #   #     #    #     #     # #      # #    #  #         
+            #     # #       #  #######  #     # #       #   #     #     #  ######  #      ##    
+  @title A Hackathon Project
+  @author John Oba  <@johnexzy>  Anthony Nwobodo <@francosion042>
+  @dev A donation system that handles donation and disbursements of funds as USDC to beneficiaries
+
   */
 pragma solidity ^0.8.2;
 
