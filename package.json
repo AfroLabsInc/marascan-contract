@@ -2,11 +2,11 @@
   "name": "hardhat-project",
   "scripts": {
     "commit": "cz",
-    "deploy": "npx hardhat run scripts/deploy.ts --network goerly",
-    "deployO": "npx hardhat run scripts/deployOperations.ts --network goerly",
-    "verify": "npx hardhat run scripts/verify.ts --network goerly",
-    "simulate": "npx hardhat run scripts/simulate.ts --network goerly",
-    "simulateM": "npx hardhat run scripts/simulateMain.ts --network goerly"
+    "deploy": "npx hardhat run scripts/deploy.ts --network polygon",
+    "deployO": "npx hardhat run scripts/deployOperations.ts --network polygon",
+    "verify": "npx hardhat run scripts/verify.ts --network polygon",
+    "simulate": "npx hardhat run scripts/simulate.ts --network polygon",
+    "simulateM": "npx hardhat run scripts/simulateMain.ts --network polygon"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
@@ -28,6 +28,7 @@
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
     "@openzeppelin/hardhat-upgrades": "^1.20.0",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
+    "@uniswap/v3-periphery": "^1.4.3",
     "dotenv": "^16.0.2"
   }
 }

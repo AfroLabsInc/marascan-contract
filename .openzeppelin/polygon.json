@@ -1,0 +1,299 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x6ba66DB5Dd420C3D9ADf720C573B3B8Ef5b10ec3",
+    "txHash": "0x9544f98f1304247f939b814f8b760cfdc612fbf28e150ae49b8990f6f1cc9d62"
+  },
+  "proxies": [
+    {
+      "address": "0x1e0dD55d930C93B8E70e39b648fCa3Ff2C4538C7",
+      "txHash": "0x1874e4e618ce30993b56cf6a6b59c27510052ca6bdbf72a382e0918dc59ed678",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "3240a72c478e2edc05be3cec07ef942290209d06b008420c30d6200a4a8221ad": {
+      "address": "0x18E71fb1b0a1bde8e2696BA98303f3AaA0EeF2d0",
+      "txHash": "0x5745dd57fea543904271dfb3ead05683f049ef0bf3a928c3e6d424d9b3d29610",
+      "layout": {
+        "storage": [
+          {
+            "label": "_roles",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_bytes32,t_struct(RoleData)413_storage)",
+            "contract": "AccessControl",
+            "src": "@openzeppelin/contracts/access/AccessControl.sol:55"
+          },
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "1",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "WMATIC",
+            "offset": 2,
+            "slot": "1",
+            "type": "t_address",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:28"
+          },
+          {
+            "label": "USDC",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:29"
+          },
+          {
+            "label": "swapRouter",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_contract(ISwapRouter)2958",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:31"
+          },
+          {
+            "label": "MASTER_WALLET",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_address",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:32"
+          },
+          {
+            "label": "BADGE",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_address",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:37"
+          },
+          {
+            "label": "secret",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_bytes32",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:39"
+          },
+          {
+            "label": "minimumAmountToDisburse",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_uint256",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:41"
+          },
+          {
+            "label": "allDisbursedDonations",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_array(t_struct(Donation)4811_storage)dyn_storage",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:43"
+          },
+          {
+            "label": "unDisbursedDonations",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_array(t_struct(Donation)4811_storage)dyn_storage",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:44"
+          },
+          {
+            "label": "poolFee",
+            "offset": 0,
+            "slot": "10",
+            "type": "t_uint24",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:45"
+          },
+          {
+            "label": "unDisbursedAmount",
+            "offset": 0,
+            "slot": "11",
+            "type": "t_uint256",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:47"
+          },
+          {
+            "label": "totalAmountDisbursed",
+            "offset": 0,
+            "slot": "12",
+            "type": "t_uint256",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:48"
+          },
+          {
+            "label": "processingFeePercent",
+            "offset": 0,
+            "slot": "13",
+            "type": "t_uint256",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:49"
+          },
+          {
+            "label": "approvedTokens",
+            "offset": 0,
+            "slot": "14",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:52"
+          },
+          {
+            "label": "claimBadgesForDonors",
+            "offset": 0,
+            "slot": "15",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:53"
+          },
+          {
+            "label": "donationRequestBeneficiaries",
+            "offset": 0,
+            "slot": "16",
+            "type": "t_mapping(t_uint256,t_array(t_struct(BeneficiaryOutput)4821_storage)dyn_storage)",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:54"
+          },
+          {
+            "label": "beneficiary",
+            "offset": 0,
+            "slot": "17",
+            "type": "t_array(t_struct(BeneficiaryOutput)4821_storage)dyn_storage",
+            "contract": "MachoMara",
+            "src": "contracts/MarascanMatic.sol:73"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_struct(BeneficiaryOutput)4821_storage)dyn_storage": {
+            "label": "struct MachoMara.BeneficiaryOutput[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_struct(Donation)4811_storage)dyn_storage": {
+            "label": "struct MachoMara.Donation[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(ISwapRouter)2958": {
+            "label": "contract ISwapRouter",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)413_storage)": {
+            "label": "mapping(bytes32 => struct AccessControl.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(BeneficiaryOutput)4821_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct MachoMara.BeneficiaryOutput[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(BeneficiaryOutput)4821_storage": {
+            "label": "struct MachoMara.BeneficiaryOutput",
+            "members": [
+              {
+                "label": "beneficiaryAddresses",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amountPerBeneficiary",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Donation)4811_storage": {
+            "label": "struct MachoMara.Donation",
+            "members": [
+              {
+                "label": "donor",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "donationRequestId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(RoleData)413_storage": {
+            "label": "struct AccessControl.RoleData",
+            "members": [
+              {
+                "label": "members",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint24": {
+            "label": "uint24",
+            "numberOfBytes": "3"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}

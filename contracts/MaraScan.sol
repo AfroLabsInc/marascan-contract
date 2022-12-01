@@ -13,10 +13,13 @@
   @notice This cotract is not audited and only written for the purpose of a Hackathon, take caution
   */
 pragma solidity ^0.8.2;
+pragma abicoder v2;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 // import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./IBadges.sol";
 import "./Interface.sol";
@@ -25,8 +28,14 @@ contract MaraScan is AccessControl, Initializable {
     // uniswap address
     address internal constant UNISWAP_ROUTER_ADDRESS =
         0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
-    IUniswapV2Router02 public uniswapRouter;
 
+    address public constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address public constant WMATIC = 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889;
+    address public constant USDC = 0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747;
+
+    IUniswapV2Router02 public uniswapRouter;
+    ISwapRouter public constant swapRouter =
+        ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
     address public MASTER_WALLET;
     /** =====SUPPORTED ROLES======= **/
     bytes32 public constant ADMIN_ROLE = 0x00;
@@ -34,22 +43,23 @@ contract MaraScan is AccessControl, Initializable {
     // ===Badge Contract ADDRESS======
     address public BADGE;
 
-    // ====USDC Contract ADDRESS=====
-    address public USDC;
-
     bytes32 private secret;
 
     uint256 public minimumAmountToDisburse; //
     // Donation[] public unDisbursedDonations;
     Donation[] public allDisbursedDonations;
     Donation[] public unDisbursedDonations;
+    uint24 public poolFee;
+
     uint256 public unDisbursedAmount;
     uint256 public totalAmountDisbursed;
     uint256 public processingFeePercent;
+
     // ====Acceptable Tokens========
     mapping(address => bool) public approvedTokens;
     mapping(uint256 => uint256) public claimBadgesForDonors;
     mapping(uint256 => BeneficiaryOutput[]) donationRequestBeneficiaries;
+
     //===== STRUCTS =====
     struct Donation {
         address donor;
@@ -101,19 +111,19 @@ contract MaraScan is AccessControl, Initializable {
      **/
     function initialize() public initializer {
         _setupRole(ADMIN_ROLE, msg.sender);
-        uniswapRouter = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
         minimumAmountToDisburse = 500;
-        USDC = 0x07865c6E87B9F70255377e024ace6630C1Eaa37F;
+        // swapRouter =
         processingFeePercent = 5;
+        poolFee = 3000;
         MASTER_WALLET = 0x896f16dfb69d916AeA7315b7455Cc7b5a79157c7;
     }
 
     /**
-     * @notice Disburses th Recieved USDC token and disburse equally to Beneficiaries
+     * @notice Disburses the Recieved USDC token and disburse equally to Beneficiaries
      * @param _amount: amount of Token( USDC) to donate
      * @param _donationDetails: list of benefiaries addresses
      */
-    function donationFromCircle(
+    function donationFromHook(
         uint256 _amount,
         uint256 _donationRequestId,
         BeneficiaryInput[] calldata _donationDetails,
@@ -235,10 +245,9 @@ contract MaraScan is AccessControl, Initializable {
 
     /**
      * @dev Recieves ETH, Swap to USDC and disburse? equally to Beneficiaries
-     * @param amountOut: Minimum amount of USDC to receive
+
      */
     function SwapExactETHForTokens(
-        uint256 amountOut,
         uint256 _donationRequestId,
         BeneficiaryInput[] calldata _donationDetails,
         uint256 totalNumberOfAcres,
@@ -246,16 +255,28 @@ contract MaraScan is AccessControl, Initializable {
         bool disburse
     ) external payable {
         require(secretKey == secret, "Unauthorized caller");
-        address[] memory path = new address[](2);
-        path[0] = uniswapRouter.WETH();
-        path[1] = USDC;
-        uint256[] memory swapResult = uniswapRouter.swapExactETHForTokens{
-            value: msg.value
-        }(amountOut, path, address(this), block.timestamp + 50);
+        require(msg.value > 0, "Amount too small");
 
-        uint256 processingFee = (swapResult[1] / 100) * processingFeePercent;
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
+            .ExactInputSingleParams({
+                tokenIn: WMATIC,
+                tokenOut: USDC,
+                fee: poolFee,
+                recipient: msg.sender,
+                deadline: block.timestamp + 15,
+                amountIn: msg.value,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            });
 
-        uint256 actualAmount = swapResult[1] - processingFee;
+        // The call to `exactInputSingle` executes the swap.
+        uint256 swapResult = swapRouter.exactInputSingle{value: msg.value}(
+            params
+        );
+
+        uint256 processingFee = (swapResult / 100) * processingFeePercent;
+
+        uint256 actualAmount = swapResult - processingFee;
         unDisbursedAmount += actualAmount;
         uint256 amountPerAcre = actualAmount / totalNumberOfAcres;
 
@@ -277,7 +298,7 @@ contract MaraScan is AccessControl, Initializable {
         );
         emit Donated(
             msg.sender,
-            swapResult[1],
+            swapResult,
             _donationRequestId,
             unDisbursedAmount,
             beneficiary
@@ -458,14 +479,6 @@ contract MaraScan is AccessControl, Initializable {
     {
         BADGE = _tokenAddress;
         emit ChangedBadgeContract(_tokenAddress);
-    }
-
-    function setUSDCTokenContract(address _tokenAddress)
-        public
-        onlyRole(ADMIN_ROLE)
-    {
-        USDC = _tokenAddress;
-        emit ChangedUSDCContract(_tokenAddress);
     }
 
     // ===============WITHDRAW FUNCTIONS========================

@@ -5,7 +5,7 @@ import { ContractFactory } from 'ethers'
 import abi from './abi'
 import Web3 from 'web3';
 const wallet = new Wallet(
-  `0x00202c47ec042093c6b5225f398c689eaa8b0e8c1c63740486080b9fec34e72a`
+  process.env.PRIVATE_KEY!
 );
 const main = async () => {
 
@@ -15,7 +15,7 @@ const main = async () => {
   const withdrawal = new ContractFactory(abi.abi, abi.bytecode, signer);
 
   const MaraScanOperations = await withdrawal.attach(
-    '0xB69a9486376ED4f345Bb08005283C602a8eB8C96'
+    '0x1e0dD55d930C93B8E70e39b648fCa3Ff2C4538C7'
   );
   //   console.log(withdrawal.withdrawFromUser())
   const valueBefore = Math.floor(Date.now() / 1000) + 3600;
@@ -41,7 +41,7 @@ const main = async () => {
       name: 'USD Coin',
       version: '2',
       chainId: 5,
-      verifyingContract: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
+      verifyingContract: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
     },
     primaryType: 'TransferWithAuthorization',
     message: {

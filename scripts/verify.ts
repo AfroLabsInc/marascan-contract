@@ -12,7 +12,7 @@ async function main() {
   
 //   console.log("MaraScan deployed to:", contract.address);
   await run("verify:verify", {
-    address: '0xde518F5e57b68303f205C0C647CB84470fF75eE1',
+    address: '0x18E71fb1b0a1bde8e2696BA98303f3AaA0EeF2d0',
     constructorArguments: [],
   });
 }
