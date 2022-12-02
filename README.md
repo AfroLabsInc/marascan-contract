@@ -2,7 +2,7 @@
 This contract was written in purpose of a Hackathon. use cautiosly
 
 
-## Concepts of the MaraScan Contract?
+## Concepts of the MachoMara Contract?
 - It is an upgradeable UUPS contract
 - Accepts USDC (central cuurency) Token from donor and disbures equally to beneficiaries
 - Accepts MATIC from donor, swaps Exact MATIC to USDC and disbures equally to beneficiaries
