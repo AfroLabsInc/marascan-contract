@@ -58,6 +58,7 @@ describe("Lock", function () {
 
   describe("Withdrawals", function () {
     describe("Validations", function () {
+      
       it("Should revert with the right error if called too soon", async function () {
         const { lock } = await loadFixture(deployOneYearLockFixture);
 
