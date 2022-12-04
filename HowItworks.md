@@ -43,4 +43,7 @@
 <img src="https://github.com/AfroLabsInc/marascan-fe/blob/main/public/img/step13.png?raw=true" />
     </div>  
 
+ <div style="text-align: center">
+<img src="https://github.com/AfroLabsInc/marascan-fe/blob/main/public/img/step14.png?raw=true" />
+    </div>  
 
