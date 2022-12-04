@@ -1,14 +1,16 @@
 
- # [Demo presentation](https://youtu.be/yQm133X3iyg)
+ ## [Video Demo presentation](https://youtu.be/yQm133X3iyg)
 [![Step Image](https://img.youtube.com/vi/yQm133X3iyg/0.jpg)](https://www.youtube.com/watch?v=yQm133X3iyg)
  # MachoMara has two windows for access, the web DApp and the offline USSD Interface for beneficiaries
 <div style="text-align: center">
 <img  src="https://github.com/AfroLabsInc/marascan-fe/blob/main/public/img/Screenshot%202022-09-25%20at%205.12.45%20PM.png?raw=true" />
 </div>
- ## The web onboarding process for Donors is divided into two parts, Organization and Individual Donor. 
+
+## The web onboarding process for Donors is divided into two parts, Organization and Individual Donor. 
 <div style="text-align: center">
 <img src="https://github.com/AfroLabsInc/marascan-fe/blob/main/public/img/step1.png?raw=true" />
 </div>
+
 when the user clicks on either the Organization or Individual account setup, it takes them to the respective onboarding form for their type. 
 the onboarding flow for either organization or individual account has 3 steps
 
@@ -58,7 +60,7 @@ This is now to confirm donation details and confirm payment.
  - Link to Simulator : https://developers.africastalking.com/simulator
  - USSD code : *384*39111# 
 ### You can use the following details to access a pre-registered account in other to skip the reagistration steps
- - Beneficiary: +234903948593719
+ - Beneficiary: +234 903 485 3719
  - Password to account : 1234567890
 
 <div style="text-align: center">
