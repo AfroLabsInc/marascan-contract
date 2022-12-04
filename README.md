@@ -15,13 +15,13 @@ International organizations are contributing money to a global program of suppor
 
 ### Our Solution
 
-![20220921_140007#1](https://user-images.githubusercontent.com/45284758/205490656-67cc9e36-1bf1-4e1b-98c0-0290225e23c4.jpeg)
-
 MachoMara, coined from the Swahili word Macho and Mara which means “Eyes of Mara” is a Decentralised Donation platform that takes advantage the Security and Transparency of the Blockchain technology to provide a secure, fast and verifiable channel for individual and organization donors to donate to the course of preserving our wildlife.
 By integrating AML and identity check), we guarantee secure transactions from credible donors and beneficiaries, thereby ensuring that our platform is not a channel for fraudulent activities.
 MachoMara, unlike various De-Fi and traditional donation platforms already existing, utilizes USSD and M-Pesa to provide last-mile payment service to the beneficiaries, this successfully bridges the gap hindering the adoption of Blockchain in remote parts of Africa, especially the Masai Mara.
 
 ### MachoMara - Blockchain in Wildlife Preservation
+
+![20220921_140007#1](https://user-images.githubusercontent.com/45284758/205491015-91c498a0-7bd6-47e5-a48f-6009b9dd35b6.jpeg)
 
 One of the challenges facing conservancies and individual land owners is lack of adequate funding, and that is not entirely because there are no donations coming, but also because of the cost of getting the donations across to the intended beneficiaries. 
 Using traditional systems, donors will have to rely on various agencies and organizations who act as middlemen. The major role of these middlemen is, but not limited to, serving as channels between the donors and the beneficiaries. This comes with a huge cost, and also creates room for concerns, especially in respect to transparency and accountability.  
