@@ -4,6 +4,7 @@
 <h2> Name:  MachoMara </h2>
 <h2> Category: Web3 Integration in Web2 </h2>
 
+## Slide Deck : [here](https://docs.google.com/presentation/d/1ZcrDpnI7wHyt1MfqeaDxfkgZHud0lSVnMsjn9DFSRjQ/edit?usp=sharing)
 ### Problem Statement
 
 The Masai Mara people are very conservative in nature, with most of them relying on agricultural activities like farming or keeping livestock, only few are educated.
