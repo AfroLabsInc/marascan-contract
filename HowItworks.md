@@ -53,12 +53,14 @@ This is now to confirm donation details and confirm payment.
 <div style="text-align: center">
 <img src="https://github.com/AfroLabsInc/marascan-fe/blob/main/public/img/step9.png?raw=true" />
 </div>  
-<h3> Here's the Beneficiary window which is an offline ussd interface for the rural/native people to access the donations </h3>
-- Link to Simulator : https://developers.africastalking.com/simulator
-- USSD code : *384*39111#
-### Use the following details to access a pre-registered account to play around
-- Beneficiary: +234903948593719
-- Password to account
+    
+ ##  Here's the Beneficiary window which is an offline ussd interface for the rural/native people to access the donations :
+ - Link to Simulator : https://developers.africastalking.com/simulator
+ - USSD code : *384*39111# 
+### You can use the following details to access a pre-registered account in other to skip the reagistration steps
+ - Beneficiary: +234903948593719
+ - Password to account : 1234567890
+
 <div style="text-align: center">
 <img src="https://github.com/AfroLabsInc/marascan-fe/blob/main/public/img/step10.png?raw=true" />
 </div>  
